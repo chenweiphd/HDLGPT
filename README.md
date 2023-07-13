@@ -19,10 +19,11 @@ Overall, HDLGPT is a game-changer for hardware engineering, and its potential ap
 Overall, HDLGPT represents an exciting development in the field of hardware design and is poised to revolutionize the way in which digital circuits are designed and implemented.
 
 ## Refernce
-Item |  Link  | 
------ | -------- | 
-陈巍：GPT大模型攻克先进32位流水线RISC-V芯片设计难题 | https://zhuanlan.zhihu.com/p/638569518 | 
-ChipChat论文 | https://arxiv.org/pdf/2305.1324 | 
-CyperRio代码 | https://github.com/hello-eternity/Cyberrio | 
-ChipChat代码 | https://zenodo.org/record/7953725 | 
-ChipGPT论文 | [ChipGPT: How far are we from natural language hardware design](https://arxiv.org/abs/2305.14019) | 
+Importance|Item |  Link  | Comment|
+----- | -------- | -----|------|
+| * |陈巍：GPT大模型攻克先进32位流水线RISC-V芯片设计难题 | https://zhuanlan.zhihu.com/p/638569518 | Overview of GPT design chip|
+| * |陈巍：GPT-4核心技术分析报告（2）|https://zhuanlan.zhihu.com/p/620087339| 重点看上下文学习、Prompt、思维链 |
+| *  |ChipChat论文 | https://arxiv.org/pdf/2305.1324 | 重点看prompt模式  |
+|   |CyperRio代码 | https://github.com/hello-eternity/Cyberrio |   |
+| * |ChipChat代码 | https://zenodo.org/record/7953725 | 参考Prompt   |
+|    |ChipGPT论文 | [ChipGPT: How far are we from natural language hardware design](https://arxiv.org/abs/2305.14019) |   |
