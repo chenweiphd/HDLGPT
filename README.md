@@ -1,3 +1,6 @@
+![image](https://github.com/chenweiphd/HDLGPT/assets/100336131/d3aed6aa-9698-47ca-a225-fd8432db95d9)
+
+
 # HDLGPT
 
 Hardware Description Language Generative Pre-trained Transformer (HDLGPT) is a type of transformer-based generative language model that has been pre-trained on large amounts of hardware description language (HDL) code data. 
