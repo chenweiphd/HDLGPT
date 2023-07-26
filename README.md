@@ -78,6 +78,6 @@ Project guide : CHEN Wei, ZHOU Yinhao, LI Ying, LIU Jian
 
 Code development:
 
-| Name | Organization | Responsible for                                            |                    |
-| ---- | ------------ | ---------------------------------------------------------- | ------------------ |
-|      | Sun Shichu   | Institute of Microelectronics, Chinese Academy of Sciences | Prompt Engineering |
+| Name       | Organization                                               | Responsible for    |
+| ---------- | ---------------------------------------------------------- | ------------------ |
+| Sun Shichu | Institute of Microelectronics, Chinese Academy of Sciences | Prompt Engineering |
