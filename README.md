@@ -11,6 +11,10 @@ Hardware Description Language Generative Pre-trained Transformer (HDLGPT) is a t
 HDLGPT is a state-of-the-art natural language processing model that has been specifically designed to generate high-quality HDL code for digital hardware circuits. The model is based on a sequence-to-sequence architecture, that takes a sequence of input tokens as input and generates a sequence of output tokens as output. The generated HDL code is not just of high quality, but is also optimized, which makes it ideal for use in the design of modern digital circuits.
 
 With the increasing demand for digital circuits, HDLGPT has emerged as a powerful tool for hardware designers to generate optimized HDL code. The model's ability to generate code from natural language input has made it easier for designers to create complex digital circuits with ease. Moreover, the generated code is of high quality, which reduces the time and effort required for debugging and optimization.
+![image](https://github.com/chenweiphd/HDLGPT/assets/100336131/fd834f45-e5be-4b97-9099-cddccc9189a4)
+
+
+
 
 HDLGPT is undeniably a revolutionary technology that has been gaining popularity in the hardware engineering industry. It is a powerful tool that can greatly enhance productivity by reducing the time and effort required to develop complex digital circuits. With HDLGPT, hardware engineers can now focus more on the creative aspects of the design process, rather than spending countless hours on mundane tasks such as coding and testing.
 
@@ -33,12 +37,19 @@ The pre-training stage involves optimizing the model's parameters and hyperparam
 Once the model is pre-trained, it can be fine-tuned on a smaller dataset of HDL code that is specific to a particular task or domain.
 
 This process involves adjusting the pre-trained model to fit the nuances and idiosyncrasies of the specific HDL code, allowing it to generate more accurate and relevant code. Fine-tuning can be a time-consuming process, as it requires a significant amount of data to be collected and prepared for training. However, the benefits of fine-tuning are clear: it leads to models that are better suited to specific tasks and domains, and that can generate code that is more accurate and efficient.
+![image](https://github.com/chenweiphd/HDLGPT/assets/100336131/94e0b97a-e2ba-494a-8029-3c4c120d8644)
+
 
 ### 2.3 Reinforce Learning with Human Feedback
 
 Reinforcement learning with human feedback can be used to further optimize the performance of HDLGPT. This involves rewarding the model for generating high-quality HDL code and penalizing it for generating errors or invalid code. The model can be designed to receive feedback from human experts, who can evaluate the generated code and provide feedback on its quality.
 
 This feedback can be used to adjust the model's parameters and further improve its performance. By combining the power of pre-training with reinforcement learning and human feedback, HDLGPT can become even more accurate and effective in generating optimized HDL code for digital hardware circuits.
+![image](https://github.com/chenweiphd/HDLGPT/assets/100336131/a771ca62-afed-4b79-8b8a-17a968a7f6c5)
+
+
+
+
 
 ## 3 Prompt Engineering
 
@@ -47,6 +58,8 @@ Prompt engineering refers to the process of designing and selecting appropriate 
 The process of prompt engineering involves selecting a set of input tokens that best convey the desired output. The selected tokens are then used to generate the output sequence using the HDLGPT model. The challenge in prompt engineering is to find the right balance between providing enough information for the model to generate accurate output, without overwhelming it with unnecessary details.
 
 To overcome this challenge, several techniques can be used, such as providing context-specific prompts, generating multiple prompts and selecting the best one, and using human feedback to refine the prompt selection process. By using these techniques, engineers can ensure that HDLGPT generates optimized HDL code that meets their design requirements.
+<img width="664" alt="6e7ffd66bcabc93ce63374629e8a5383_prompt" src="https://github.com/chenweiphd/HDLGPT/assets/100336131/9adc5055-9c80-4a6f-870f-a45041bf6c04">
+
 
 ## 4 Vector Database Design
 
@@ -57,10 +70,14 @@ To facilitate the use of HDL vectors, a vector database can be created, which co
 The database should  be designed to be easily searchable and accessible, so that engineers can quickly find the vectors they need.
 
 To ensure the quality and relevance of the vectors in the database, a rigorous vetting and curation process should be implemented. This process should involve experts in the field of HDL code design, who can evaluate the vectors for their accuracy, relevance, and usefulness.
+![image](https://github.com/chenweiphd/HDLGPT/assets/100336131/0bfddb69-9c0f-42bb-bc18-032a00354950)
 
 
 
-## Refernce
+
+
+
+## Reference
 Importance|Item |  Link  | Comment|
 ----- | -------- | -----|------|
 | * |陈巍：GPT大模型攻克先进32位流水线RISC-V芯片设计难题 | https://zhuanlan.zhihu.com/p/638569518 | Overview of GPT design chip|
