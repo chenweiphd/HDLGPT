@@ -30,3 +30,9 @@ Importance|Item |  Link  | Comment|
 |   |CyperRio代码 | https://github.com/hello-eternity/Cyberrio |   |
 | * |ChipChat代码 | https://zenodo.org/record/7953725 | 参考Prompt   |
 |    |ChipGPT论文 | [ChipGPT: How far are we from natural language hardware design](https://arxiv.org/abs/2305.14019) |   |
+
+
+## Contributors
+Name|Organization | Responsible for|
+----- | -------- | --------|
+| Sun Shichu| Institute of Microelectronics, Chinese Academy of Sciences| Prompt Engineering|
