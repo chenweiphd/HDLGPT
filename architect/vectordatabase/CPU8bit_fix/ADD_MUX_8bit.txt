@@ -1,0 +1,30 @@
+/**
+ * @file ADD_MUX_8bit.v
+ * @Requirements R001 - The addr mux shall select between IR and PC address
+ * @Requirements R002 - addr shall be valid one cycle after sel is valid
+ * @Task Multiplex between two 8-bit input addresses based on sel signal
+*/
+
+/** 
+ * @module ADD_MUX_8bit
+ * @desc Implement an 8-bit 2-to-1 multiplexer to select between IR_addr and PC_addr based on sel signal.
+*/
+
+module ADD_MUX_8bit(
+    input [7:0] IR_addr, 
+    input [7:0] PC_addr,
+    input sel,
+
+    /*@requires
+        sel == 0 || sel == 1;
+    */
+
+    /*@ensures
+        sel == 0 -> \result == pcAddr;
+        sel == 1 -> \result == irAddr;
+    */
+    output [7:0] addr
+    );
+
+    assign addr = sel ? IR_addr : PC_addr;
+endmodule

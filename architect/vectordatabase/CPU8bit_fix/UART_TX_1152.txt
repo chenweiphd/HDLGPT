@@ -1,0 +1,136 @@
+`timescale 1ns / 1ps
+
+/**
+ * @file UART_TX_1152.v
+ * @Requirements R001 - Implement UART transmitter with 115200 baud rate
+ * @Requirements R002 - Asynchronous uart enable, synchronous FSM  
+ * @Task Design a UART transmitter with baud rate generator
+*/
+/**
+ * @module UART_TX_1152
+ * @desc UART transmitter
+*/
+
+module UART_TX_1152 #(
+    parameter BAUD = 115200,
+    parameter CLK_frq = 100000000
+)(
+    input sys_clk,//System clock
+    input rst_n,//The system resets
+    input uart_en,//UART Send enable end. Asynchronous signal
+    input [7:0]data,//BYTE to be output
+    /* @requires
+        \always(\valid(sys_clk))
+        \always(sys_clk == 100MHz) 
+    */
+
+    /* @ensures
+        rst_n == 0 -> uart_txd == 1;
+
+        uart_en == 1 -> 
+            \eventually(uart_txd == 0 && \onedata == data &&
+                    \nostatechange_uart_txd[7:0] &&
+                    uart_txd == 1)
+    */
+    output reg uart_txd//UART sending end
+    );
+    wire baud_clk;
+    //Generates the baud rate clock
+    CLK_div_1152 #(
+        .BAUD(BAUD),
+        .CLK_frq(CLK_frq)
+    )CLK_div_dut(
+        .sys_clk(sys_clk),
+        .rst_n(rst_n),
+        .baud_clk (baud_clk)
+    );
+
+    //uart_en Indicates synchronization of asynchronous signals
+    reg uart_en_d0,uart_en_d1;
+    always @(posedge baud_clk or negedge rst_n) begin
+        if(!rst_n)begin
+            uart_en_d0 <= 1'b0;
+            uart_en_d1 <= 1'b0;
+        end
+        else begin
+            uart_en_d0 <= uart_en;
+            uart_en_d1 <= uart_en_d0;
+        end
+    end
+
+    //FSM state coding
+    localparam IDLE = 4'b0001;
+    localparam START= 4'b0010;
+    localparam DATA = 4'b0100;
+    localparam STOP = 4'b1000;
+    //FSM status register
+    reg [3:0] cstate,nstate;
+    //Send data register
+    reg [7:0] data_reg;
+    
+    //Send a bit counter
+    reg [2:0] data_cnt;
+    always @(posedge baud_clk or negedge rst_n) begin
+        if(!rst_n)begin
+            data_cnt <= 3'd0;
+        end
+        else if(cstate == DATA)begin
+            data_cnt <= data_cnt + 3'd1;
+        end
+        else begin
+            data_cnt <= 3'd0;
+        end
+    end
+    //FSM status transfer synchronization logic
+    always @(posedge baud_clk or negedge rst_n) begin
+        if(!rst_n)begin
+            cstate <= IDLE;
+        end
+        else begin
+            cstate <= nstate;
+        end
+    end
+    //The FSM generates the next state combination logic
+    always @(*) begin
+        case (cstate)
+            IDLE,STOP:begin
+                nstate = uart_en_d1?START:IDLE;
+            end
+            START:begin
+                nstate = DATA;
+            end
+            DATA:begin//When the value ranges from 0 to 7, the sending BYTE is complete
+                nstate = (&data_cnt)?STOP:DATA;
+            end
+            default:nstate = IDLE;
+        endcase
+    end
+    //The FSM generates output logic
+    always @(posedge baud_clk or negedge rst_n) begin
+        if(!rst_n)begin
+            data_reg <= 8'h00;
+            uart_txd <= 1'b1;
+        end
+        else begin
+            case (nstate)
+                START:begin
+                    data_reg <= data;
+                    uart_txd <= 1'b0;
+                end
+                DATA:begin
+                    data_reg <= data_reg>>1;
+                    uart_txd <= data_reg[0];
+                end
+                STOP:begin
+                    data_reg <= 8'h00;
+                    uart_txd <= 1'b1;
+                end
+                default:begin
+                    data_reg <= 8'h00;
+                    uart_txd <= 1'b1;
+                end
+            endcase
+        end
+    end
+
+endmodule

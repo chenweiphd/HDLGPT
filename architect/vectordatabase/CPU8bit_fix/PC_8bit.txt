@@ -1,0 +1,53 @@
+/**
+ * @file PC_8bit.v
+ * @Requirements R001 - 8-bit program counter with synchronous reset
+ * @Requirements R002 - Support increment, load and hold counter value
+ * @Task The PC module store the address of the next instruction to be executed.Implement an 8-bit program counter for instruction address generation
+*/
+
+/**
+ * @module PC_8bit 
+ * @desc 8 bit program counter
+*/
+
+module PC_8bit (
+  input        clk,
+  input        rst_n, 
+  input        en,
+  input        chg_en,
+  input [7:0]  chg_addr,
+
+  /*@requires 
+    \valid(clk);
+    \valid(rst_n);
+    \valid(en); 
+    \valid(chg_en);
+    \valid(chg_addr);
+  */
+
+  /*@ensures
+    rst_n == 0 -> \result == 8'h00;
+    en == 1 && chg_en == 0 -> \result == \old(\result) + 8'h01;
+    en == 1 && chg_en == 1 -> \result == chg_addr;
+    en == 0 -> \result == \old(\result);
+  */
+  
+  output reg [7:0] PC_addr
+);
+
+  //Implementation code
+  initial begin
+    PC_addr = 0;
+  end
+  always @(posedge clk) begin     //PC_addr  if(en)&if(!chg_en)   PC_addr+1
+      if(!rst_n)
+          PC_addr <= 8'h00;
+      else if(en)
+          if(chg_en)
+              PC_addr <= chg_addr;
+          else
+              PC_addr <= PC_addr + 8'h01;
+      else
+          PC_addr <= PC_addr;
+  end
+endmodule

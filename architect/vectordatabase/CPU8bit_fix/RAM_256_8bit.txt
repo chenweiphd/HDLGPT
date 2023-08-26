@@ -1,0 +1,39 @@
+/**
+ * @file RAM_256_8bit.v
+ * @Requirements R001 - Implement 256x8 bit RAM for data storage  
+ * @Requirements R002 - Synchronous read and asynchronous write
+ * @Task Design a 256x8 data RAM with read/write ports  
+*/
+
+/**
+ * @module RAM_256_8bit
+ * @desc 256x8-bit read/write RAM
+*/
+module RAM_256_8bit(
+    input read,
+    input write,
+    input en,
+    input [7:0]addr,
+    inout [7:0]data
+    /*@requires
+    0 <= addr < 256;
+    \valid(read);
+    \valid(write);
+    \valid(en);
+    */
+
+    /*@ensures
+      en == 1 && read == 1 -> \result == memory[addr];
+      en == 1 && write == 1 -> memory[addr] == \old(data);
+      en == 0 || (read == 0 && write == 0) -> \result == 8'hzz; 
+    */
+    );
+    reg [7:0] memory[255:0];
+    //Read operation
+    assign data = (read&en)?memory[addr]:8'hzz;     //data if(read&&en) memory[addr]
+    //Write operation
+    always @(posedge write) begin
+        if(en)
+            memory[addr] <= data;
+    end
+endmodule

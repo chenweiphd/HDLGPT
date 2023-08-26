@@ -1,0 +1,382 @@
+/**
+ * @file CTRL_8bit.v
+ * @Requirements R001 - Control CPU execution flow based on instructions
+ * @Requirements R002 - Implement state machine with fetch, decode, execute stages  
+ * @Task Design the main controller unit of the 8-bit CPU.Responsible for controlling the program running process, controlling PC, IR, ALU, ADDR_MUX, REG, ACC, ROM and RAM
+*/
+
+/**
+ * @module CTRL_8bit 
+ * @desc CPU8bit controller
+*/
+module CTRL_8bit(
+    /* @domain
+     ins == {NOP, LDO, LDA, LDR, PRE, STO, ADD, SHL, SHR, SAR, INV, AND, OR, XOR, JMP, HLT}
+    */
+    input clk,
+    input rst_n,
+    input [3:0]ins,
+    /*@requires
+    \always(\valid(clk));
+    \always(\valid(rst_n));
+    \always(\valid(ins));
+    */
+
+    /*@ensures
+      rst_n == 0 -> (\forall var, \result(var) == 0);
+      cstate == S0  -> nextstate == S1;
+      cstate == S1  -> ins == NOP  ->  nextstate == S0;
+		      ins == HLT  ->  nextstate == S2;
+		      ins == LDR  ->  nextstate == S9;
+		      ins == (LDO|LDA)|STO)|JMP)  ->  nextstate == S3;
+		      ins == else ->  nextstate == S8;
+      cstate == S2  -> nextstate == S2;
+      cstate == S3  -> ins == (LDA|LDO)  ->  nextstate == S4;
+		      ins == JMP  ->  nextstate == S10;
+		      ins == else ->  nextstate == S6;
+      cstate == S4  -> nextstate == S5;
+      cstate == S5  -> nextstate == S0;
+      cstate == S6  -> nextstate == S7;
+      cstate == S7|S8|S9|S10  -> nextstate == S0;
+    */
+    output reg REG_write,
+    output reg REG_read,
+    output reg ROM_en,
+    output reg ROM_read,
+    output reg RAM_en,
+    output reg RAM_write,
+    output reg RAM_read,
+    output reg PC_en,
+    output reg PC_chg_en,
+    output reg ACC_en,
+    output reg [1:0]fetch,
+    output reg ADDR_sel
+    );
+    //Define the instruction encoding
+    localparam NOP = 4'b0000;//Empty instruction short
+    localparam LDO = 4'b0001;//Fetch data from the ROM long
+    localparam LDA = 4'b0010;//Fetch data from RAM long
+    localparam LDR = 4'b0011;//Fetch data from ACC short 
+    localparam PRE = 4'b0100;//Fetch data  from REG short
+    localparam STO = 4'b0101;//Write data to RAM long
+    localparam ADD = 4'b0110;//Add the operand short
+    localparam SHL = 4'b0111;//Move the logical left short
+    localparam SHR = 4'b1000;//Move the logical right short 
+    localparam SAR = 4'b1001;//Count move right short
+    localparam INV = 4'b1010;//Take the inverse bit short
+    localparam AND = 4'b1011;//By bit and short
+    localparam  OR = 4'b1100;//By bit or short
+    localparam XOR = 4'b1101;//press Bitwise XOR short
+    localparam JMP = 4'b1110;//Jump  long
+    localparam HLT = 4'b1111;//Stop instruction short
+    //Define the state machine encoding
+    localparam IDLE = 4'hf;//Initial status
+    localparam S0   = 4'h0;//Take 0
+    localparam S1   = 4'h1;// Decode PC+1
+    localparam S2   = 4'h2;//HLT stops
+    localparam S3   = 4'h3;//Long0 refers to 1 RAM/ROM address
+    localparam S4   = 4'h4;//Long1 PC+1
+    localparam S5   = 4'h5;//Long2 LDO/LDA access number
+    localparam S6   = 4'h6;//Long2 STO_0 Reads the REG
+    localparam S7   = 4'h7;//Long3 STO_1 Write RAM
+    localparam S8   = 4'h8;//Short0 PRE/ADD Read REG
+    localparam S9   = 4'h9;//Short0 LDR_0 ACC Write REG
+    localparam S10  = 4'ha;
+    //Define the status register
+    reg [3:0] cstate = IDLE;
+    reg [3:0] nstate = IDLE;
+
+    //State transition synchronization logic
+    always @(posedge clk) begin
+        if(!rst_n)
+            cstate <= IDLE;
+        else
+            cstate <= nstate;
+    end
+    //Generates the next state combination logic
+    always @(*) begin
+        case(cstate)
+            IDLE:begin
+                nstate = S0;
+            end
+            S0:begin
+                nstate = S1;
+            end
+            S1:begin
+                if(ins == NOP)nstate = S0;
+                else if(ins == HLT)nstate = S2;
+                // else if((ins == PRE)|(ins == ADD)|(ins == AND)|(ins == OR)|(ins == XOR)|(ins == INV)|(ins == SHL)|(ins == SHR)|(ins == SAR))nstate = S8;
+                else if(ins == LDR)nstate = S9;
+                else if((ins == LDO)|(ins == LDA)|(ins == STO)|(ins == JMP)) nstate = S3;
+                else nstate = S8;
+            end
+            S2:begin
+                nstate = S2;
+            end
+            S3:begin
+                if((ins == LDA)|(ins == LDO))nstate = S4;
+                else if(ins == JMP)nstate = S10;
+                else nstate = S6;//STO instruction
+            end
+            S4:begin
+                nstate = S5;
+            end
+            S5:begin
+                nstate = S0;
+            end
+            S6:begin
+                nstate = S7;
+            end
+            S7:begin
+                nstate = S0;
+            end
+            S8:begin
+                nstate = S0;
+            end
+            S9:begin
+                nstate = S0;
+            end
+            S10:begin
+                nstate = S0;
+            end
+
+            default:nstate = IDLE;
+        endcase
+    end
+    //Generate output combination logic
+    always @(*) begin
+        case(cstate)
+            IDLE:begin//Initial state
+                REG_write= 1'b0;
+                REG_read = 1'b0;
+                ROM_en   = 1'b0;
+                ROM_read = 1'b0;
+                RAM_en   = 1'b0;
+                RAM_write= 1'b0;
+                RAM_read = 1'b0;
+                PC_en    = 1'b0;
+                PC_chg_en= 1'b0;
+                ACC_en   = 1'b0;
+                fetch    = 2'b00;
+                ADDR_sel = 1'b0;
+            end
+            S0:begin//Take 0
+                REG_write= 1'b0;
+                REG_read = 1'b0;
+                ROM_en   = 1'b1;
+                ROM_read = 1'b1;
+                RAM_en   = 1'b0;
+                RAM_write= 1'b0;
+                RAM_read = 1'b0;
+                PC_en    = 1'b0;
+                PC_chg_en= 1'b0;
+                ACC_en   = 1'b0;
+                fetch    = 2'b01;
+                ADDR_sel = 1'b0;
+            end
+            S1:begin//decode PC+1
+                REG_write= 1'b0;
+                REG_read = 1'b0;
+                ROM_en   = 1'b1;
+                ROM_read = 1'b1;
+                RAM_en   = 1'b0;
+                RAM_write= 1'b0;
+                RAM_read = 1'b0;
+                PC_en    = 1'b1;
+                PC_chg_en= 1'b0;
+                ACC_en   = 1'b0;
+                fetch    = 2'b00;
+                ADDR_sel = 1'b0;
+            end
+            S2:begin//HLT shutdown
+                REG_write= 1'b0;
+                REG_read = 1'b0;
+                ROM_en   = 1'b0;
+                ROM_read = 1'b0;
+                RAM_en   = 1'b0;
+                RAM_write= 1'b0;
+                RAM_read = 1'b0;
+                PC_en    = 1'b0;
+                PC_chg_en= 1'b0;
+                ACC_en   = 1'b0;
+                fetch    = 2'b00;
+                ADDR_sel = 1'b0;
+            end
+            S3:begin//Long0 take 1
+                REG_write= 1'b0;
+                REG_read = 1'b0;
+                ROM_en   = 1'b1;
+                ROM_read = 1'b1;
+                RAM_en   = 1'b0;
+                RAM_write= 1'b0;
+                RAM_read = 1'b0;
+                PC_en    = 1'b0;
+                PC_chg_en= 1'b0;
+                ACC_en   = 1'b0;
+                fetch    = 2'b10;
+                ADDR_sel = 1'b0;
+            end
+            S4:begin//Long1 PC+1
+                if(ins == LDO)begin
+                    REG_write= 1'b1;
+                    REG_read = 1'b0;
+                    ROM_en   = 1'b1;
+                    ROM_read = 1'b1;
+                    RAM_en   = 1'b0;
+                    RAM_write= 1'b0;
+                    RAM_read = 1'b0;
+                    PC_en    = 1'b0;
+                    PC_chg_en= 1'b0;
+                    ACC_en   = 1'b0;
+                    fetch    = 2'b00;
+                    ADDR_sel = 1'b1;
+                end
+                else begin//LDA
+                    REG_write= 1'b1;
+                    REG_read = 1'b0;
+                    ROM_en   = 1'b0;
+                    ROM_read = 1'b0;
+                    RAM_en   = 1'b1;
+                    RAM_write= 1'b0;
+                    RAM_read = 1'b1;
+                    PC_en    = 1'b0;
+                    PC_chg_en= 1'b0;
+                    ACC_en   = 1'b0;
+                    fetch    = 2'b00;
+                    ADDR_sel = 1'b1;
+                end
+            end
+            S5:begin//Long2 Number of LDO accesses
+                if(ins == LDO)begin
+                    REG_write= 1'b1;
+                    REG_read = 1'b0;
+                    ROM_en   = 1'b1;
+                    ROM_read = 1'b1;
+                    RAM_en   = 1'b0;
+                    RAM_write= 1'b0;
+                    RAM_read = 1'b0;
+                    PC_en    = 1'b1;
+                    PC_chg_en= 1'b0;
+                    ACC_en   = 1'b0;
+                    fetch    = 2'b00;
+                    ADDR_sel = 1'b1;
+                end
+                else begin//LDA
+                    REG_write= 1'b1;
+                    REG_read = 1'b0;
+                    ROM_en   = 1'b0;
+                    ROM_read = 1'b0;
+                    RAM_en   = 1'b1;
+                    RAM_write= 1'b0;
+                    RAM_read = 1'b1;
+                    PC_en    = 1'b1;
+                    PC_chg_en= 1'b0;
+                    ACC_en   = 1'b0;
+                    fetch    = 2'b00;
+                    ADDR_sel = 1'b1;
+                end
+            end
+            S6:begin//Long2 STO_0 Read REG
+                REG_write= 1'b0;
+                REG_read = 1'b1;
+                ROM_en   = 1'b0;
+                ROM_read = 1'b0;
+                RAM_en   = 1'b0;
+                RAM_write= 1'b0;
+                RAM_read = 1'b0;
+                PC_en    = 1'b1;
+                PC_chg_en= 1'b0;
+                ACC_en   = 1'b0;
+                fetch    = 2'b00;
+                ADDR_sel = 1'b0;
+            end
+            S7:begin//Long3 STO_1 Write RAM
+                REG_write= 1'b0;
+                REG_read = 1'b1;
+                ROM_en   = 1'b0;
+                ROM_read = 1'b0;
+                RAM_en   = 1'b1;
+                RAM_write= 1'b1;
+                RAM_read = 1'b0;
+                PC_en    = 1'b0;
+                PC_chg_en= 1'b0;
+                ACC_en   = 1'b0;
+                fetch    = 2'b00;
+                ADDR_sel = 1'b1;
+            end
+            S8:begin//Short0 PRE Read REG
+                if(ins == PRE)begin
+                    REG_write= 1'b0;
+                    REG_read = 1'b1;
+                    ROM_en   = 1'b0;
+                    ROM_read = 1'b0;
+                    RAM_en   = 1'b0;
+                    RAM_write= 1'b0;
+                    RAM_read = 1'b0;
+                    PC_en    = 1'b0;
+                    PC_chg_en= 1'b0;
+                    ACC_en   = 1'b1;
+                    fetch    = 2'b00;
+                    ADDR_sel = 1'b0;
+                end
+                else begin//ADD Read REG
+                    REG_write= 1'b0;
+                    REG_read = 1'b1;
+                    ROM_en   = 1'b0;
+                    ROM_read = 1'b0;
+                    RAM_en   = 1'b0;
+                    RAM_write= 1'b0;
+                    RAM_read = 1'b0;
+                    PC_en    = 1'b0;
+                    PC_chg_en= 1'b0;
+                    ACC_en   = 1'b1;
+                    fetch    = 2'b00;
+                    ADDR_sel = 1'b0;
+                end
+            end
+            S9:begin//Short0 LDR_0 ACC write register
+                REG_write= 1'b1;
+                REG_read = 1'b0;
+                ROM_en   = 1'b0;
+                ROM_read = 1'b0;
+                RAM_en   = 1'b0;
+                RAM_write= 1'b0;
+                RAM_read = 1'b0;
+                PC_en    = 1'b0;
+                PC_chg_en= 1'b0;
+                ACC_en   = 1'b1;
+                fetch    = 2'b00;
+                ADDR_sel = 1'b0;
+            end
+            S10:begin//JMP Modifying the PC
+                REG_write= 1'b0;
+                REG_read = 1'b0;
+                ROM_en   = 1'b1;
+                ROM_read = 1'b1;
+                RAM_en   = 1'b0;
+                RAM_write= 1'b0;
+                RAM_read = 1'b0;
+                PC_en    = 1'b1;
+                PC_chg_en= 1'b1;
+                ACC_en   = 1'b0;
+                fetch    = 2'b10;
+                ADDR_sel = 1'b0;
+            end
+            default:begin
+                REG_write= 1'b0;
+                REG_read = 1'b0;
+                ROM_en   = 1'b0;
+                ROM_read = 1'b0;
+                RAM_en   = 1'b0;
+                RAM_write= 1'b0;
+                RAM_read = 1'b0;
+                PC_en    = 1'b0;
+                PC_chg_en= 1'b0;
+                ACC_en   = 1'b0;
+                fetch    = 2'b00;
+                ADDR_sel = 1'b0;
+            end
+        endcase
+    end
+
+endmodule

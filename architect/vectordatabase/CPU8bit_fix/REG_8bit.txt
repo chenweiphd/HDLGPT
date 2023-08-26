@@ -1,0 +1,46 @@
+/**
+ * @file REG_8bit.v
+ * @Requirements R001 - Implement a register file with 16 x 8-bit registers
+ * @Requirements R002 - Support read and write access 
+ * @Task Design a register file module for the 8bitCPU,store data from RAM or ROM, as well as ALU and send data in the REG to the data bus
+*/
+
+/**
+ * @module REG_8bit
+ * @desc general-purpose register in the 8bitCPU core
+*/
+
+module REG_8bit (
+  input        clk,
+  input        write,
+  input        read,  
+  input [7:0]  addr,
+  input [7:0]  reg_in,
+
+  /*@requires
+    \valid(clk);
+    \valid(write);
+    \valid(read);
+    \valid(addr); 
+    \valid(reg_in);
+  */
+
+  /*@ensures
+    read == 1 -> \result == Register[addr[3:0]];
+    write == 1 -> Register[addr[3:0]] == reg_in; 
+  */
+
+  output [7:0] reg_out
+);
+  //the storage of CORE_REG is 16*8 bits
+  reg [7:0] Register [15:0];
+
+  //Extract the address from the instruction
+  wire [3:0]addr_r;
+  assign addr_r = addr[3:0];
+  assign reg_out = read?Register[addr_r]:8'hzz; 
+  always @(posedge clk) begin     
+      if(write)
+          Register[addr_r] <= reg_in;
+  end
+endmodule

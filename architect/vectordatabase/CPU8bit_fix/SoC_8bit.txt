@@ -1,0 +1,62 @@
+`timescale 1ns / 1ps
+
+/**
+ * @file SoC_8bit.v
+ * @Requirements R001 - Integrate CPU core, RAM, ROM as SoC  
+ * @Requirements R002 - CPU-centric architecture, AHB interconnect
+ * @Task Implement a SoC with CPU, memory and peripherals  
+*/
+/**
+ * @module SoC_8bit 
+ * @desc system package module
+*/
+
+module SoC_8bit(
+    input clk,
+    input rst_n,
+
+    /* @requires
+        \always(\valid(clk))
+    */
+
+    /* @ensures
+        rst_n == 0 -> (DB == 0 && AB == 0);
+
+        ROM_en == 1 -> \eventually(DB[\old(AB)] == ROM[\old(AB)]);
+
+        RAM_write == 1 -> \eventually(RAM[\old(AB)] == \old(DB));  
+
+        RAM_read == 1 -> \eventually(DB == \old(RAM[\old(AB)]))
+    */  
+    output [7:0]DB,
+    output [7:0]AB
+    );
+    wire ROM_en,ROM_read,RAM_en,RAM_read,RAM_write;
+    CORE_8bit CORE_0 (
+        .clk (clk),
+        .rst_n (rst_n),
+        .DB (DB),
+        .AB (AB),
+        .ROM_en (ROM_en),
+        .ROM_read (ROM_read),
+        .RAM_en (RAM_en),
+        .RAM_read (RAM_read),
+        .RAM_write (RAM_write)
+    );
+
+    RAM_256_8bit RAM_0 (
+        .read (RAM_read),
+        .write (RAM_write),
+        .en (RAM_en),
+        .data (DB),
+        .addr (AB)
+    );
+
+    ROM_256_8bit ROM_0 (
+        .read (ROM_read),
+        .en (ROM_en),
+        .addr (AB),
+        .data (DB)
+    );
+
+endmodule

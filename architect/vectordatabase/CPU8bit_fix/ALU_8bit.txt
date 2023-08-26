@@ -1,0 +1,116 @@
+/*
+Short instruction has 4bits Opcode and 4bits reg_add. 
+Long instruction is composed with 2 short 8bits instructions,
+which has 4bits Opcode, 4bits reg_add and 8bits mem_add. It includes:
+NOP 		0000	No action					short
+LDR		0001	load data from ROM				long
+LDA		0010	load data from RAM				long
+LDR		0011 	load data from ACC				short
+PRE		0100	load data from RAG				short
+STO		0101	store data from RAM				long
+ADD	    	0110	add data					short
+SHL		0111	logic shift left				short
+SHR  		1000 	logic shift right				short
+SAR		1001	arithmatic shift right				short
+INV		1010	inv for bits					short
+AND	    	1011	and for bits					short
+OR		1100	or for bits					short
+XOR		1101	xor for bits					short
+JMP		1110	jump to one addr				long
+HLT		1111	shut down					short
+*/
+
+/**
+ * @file ALU_8bit.v
+ * @Requirements R001 - Implement an 8-bit ALU for arithmetic and logic operations
+ * @Requirements R002 - Support add, shift, logic, jump and so on operations
+ * @Task Design an arithmetic logic unit for the 8-bit CPU
+*/
+
+/**
+ * @module ALU_8bit
+ * @desc Implement an 8-bit ALU that can perform operations like addition, logical shift, bitwise operations etc.It takes instruction input, ALU input data, accumulator data and outputs ALU result and status flags. 
+*/
+module ALU_8bit(
+    input [3:0]ins,
+    input [7:0]alu_in,
+    input [7:0]accum,
+    /*@requires
+    \valid(ins);
+    \valid(alu_in); 
+    \valid(accum);
+    */
+
+    /*@ensures
+    ins == NOP  -> \result == accum;
+    ins == LDO  -> \result == alu_in; 
+    ins == LDA  -> \result == alu_in;
+    ins == LDR  -> \result == accum;
+    ins == PRE  -> \result == alu_in;
+    ins == STO  -> \result == accum; 
+    ins == ADD  -> \result == accum + alu_in;
+    ins == SHL  -> \result == alu_in << 1;
+    ins == SHR  -> \result == alu_in >> 1;
+    ins == SAR  -> \result == {alu_in[7], alu_in[7:1]};
+    ins == INV  -> \result == ~alu_in;
+    ins == AND  -> \result == accum & alu_in;
+    ins == OR   -> \result == accum | alu_in;
+    ins == XOR  -> \result == accum ^ alu_in;
+    ins == JMP  -> \result == alu_in;
+    ins == HLT  -> \result == accum;
+    */
+
+    /*@ensures
+    \result[7] == \sign(\result); 
+    */
+
+    output [3:0]flags,
+    output reg [7:0]alu_out
+    );
+    localparam NOP = 4'b0000;//Empty instruction short
+    localparam LDO = 4'b0001;// Fetch data from the ROM long
+    localparam LDA = 4'b0010;// Fetch data from RAM long
+    localparam LDR = 4'b0011;// Fetch data from ACC short
+    localparam PRE = 4'b0100;// Fetch data from REG short
+    localparam STO = 4'b0101;//Write data to RAM long
+    localparam ADD = 4'b0110;//Add the operand short
+    localparam SHL = 4'b0111;//Move the logical left short
+    localparam SHR = 4'b1000;//Move the logical right short
+    localparam SAR = 4'b1001;//Count move right short
+    localparam INV = 4'b1010;//Take the inverse bit short
+    localparam AND = 4'b1011;//By bit and short
+    localparam  OR = 4'b1100;//By bit or short
+    localparam XOR = 4'b1101;//press Bitwise XOR short
+    localparam JMP = 4'b1110;//Jump long
+    localparam HLT = 4'b1111;//Stop instruction short
+
+    wire OF,ZF,PF,SF;//Overflow, zero, parity, symbol bit Flag bit
+    assign OF = ((~alu_in[7])&(~accum[7])&alu_out[7])|(alu_in[7]&accum[7]&(~alu_out[7]));
+    assign ZF = ~(|alu_out);//1 is zero. 0 is not zero
+    assign PF = ^alu_out;   //1 Odd, 0 even
+    assign SF = alu_out[7]; //1 Negative 0 positive (complement operation)
+    assign flags = {OF,ZF,SF,PF};
+
+    always @(*) begin
+        case(ins)
+            NOP:alu_out = accum;
+            LDO:alu_out = alu_in;
+            LDA:alu_out = alu_in;
+            LDR:alu_out = accum;
+            PRE:alu_out = alu_in;
+            STO:alu_out = accum;
+            ADD:alu_out = accum + alu_in;
+            SHL:alu_out = alu_in<<1;
+            SHR:alu_out = alu_in>>1;
+            SAR:alu_out = {alu_in[7],alu_in[7:1]};
+            INV:alu_out = ~alu_in;
+            AND:alu_out = accum & alu_in;
+            OR :alu_out = accum | alu_in;
+            XOR:alu_out = accum ^ alu_in;
+            JMP:alu_out = alu_in;
+            HLT:alu_out = accum;
+            default:alu_out = accum;
+        endcase
+    end
+    
+endmodule

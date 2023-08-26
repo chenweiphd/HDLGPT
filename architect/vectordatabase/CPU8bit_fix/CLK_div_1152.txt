@@ -1,0 +1,54 @@
+`timescale 1ns / 1ps
+/**
+ * @file CLK_div_1152.v
+ * @Requirements R001 - Generate 115200 baud rate clock from 100MHz reference
+ * @Requirements R002 - Asynchronous reset, 50% duty cycle output
+ * @Task Implement a baud rate generator for UART communication
+*/
+/**
+ * @module CLK_div_1152
+ * @desc Baud rate clock generator 
+*/
+
+module CLK_div_1152 #(
+    parameter BAUD = 115200,
+    parameter CLK_frq = 100000000
+)(
+    input sys_clk,//System clock
+    input rst_n,//System reset
+
+    /* @requires
+        \always(\valid(sys_clk)) 
+        \always(sys_clk == 100MHz)
+    */
+
+    /* @ensures
+        rst_n == 1 -> \result == \old(\result);
+        rst_n == 0 -> \result == 0;
+
+        \always(\period(\result) == (100MHz/115200) / 2)
+    */
+
+    output reg baud_clk//Baud rate clock
+    );
+    parameter DIV_MAX = CLK_frq/BAUD;//Number of cycles required to transmit a bit
+    parameter EDGE_NUM =DIV_MAX/2;//Jump period
+
+    reg [8:0]clk_cnt;//Frequency division counter
+    //Counter control logic
+    always @(posedge sys_clk or negedge rst_n) begin
+        if(!rst_n)begin
+            clk_cnt <= 10'd0;
+            baud_clk <= 1'b0;
+        end
+        else if(clk_cnt == EDGE_NUM)begin
+            clk_cnt <= 10'd0;
+            baud_clk <= ~baud_clk;
+        end
+        else begin
+            clk_cnt <= clk_cnt + 10'd1;
+            baud_clk <= baud_clk;
+        end
+    end
+    
+endmodule

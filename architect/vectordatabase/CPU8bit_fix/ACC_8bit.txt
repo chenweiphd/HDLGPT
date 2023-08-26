@@ -1,0 +1,42 @@
+/**
+ * @file ACC_8bit.v
+ * @Requirements R001 - The module shall accumulate 8-bit data with clock
+ * @Requirements R002 - Async clear and sync load functionality
+ * @Task Design an 8-bit accumulator register with enable and reset 
+*/
+
+/**
+ * @module ACC_8bit  
+ * @desc 8-bit synchronous accumulator register (asynchronous clear, synchronous Load).
+*/
+
+module ACC_8bit (
+    input clk,
+    input rst_n,  
+    input en,
+    input [7:0] acc_in,
+
+    /*@requires
+    rst_n == 1; 
+    \valid(en);
+    \valid(acc_in);
+    */
+
+    /*@ensures
+        rst_n == 0 -> \result == 8'h00;
+        rst_n == 1 && en == 1 -> \result == acc_in;
+        rst_n == 1 && en == 0 -> \result == \old(\result); 
+    */
+
+    output reg [7:0] acc_out
+    );
+
+    always @(posedge clk) begin
+        if(!rst_n) 
+            acc_out <= 8'h00;
+        else if(en)
+            acc_out <= acc_in; 
+        else
+            acc_out <= acc_out;
+    end
+endmodule

@@ -1,0 +1,155 @@
+`timescale 1ns / 1ps
+/**
+ * @file UART_RX_1152.v
+ * @Requirements R001 - Implement UART receiver with 115200 baud rate  
+ * @Requirements R002 - Asynchronous serial in, odd/even parity checking
+ * @Task Design a UART receiver with baud rate generator and parity checking 
+*/
+/**
+ * @module UART_RX_1152
+ * @desc UART receiver
+*/
+
+module UART_RX_1152 #(
+    parameter BAUD = 115200,//bps
+    parameter CLK_frq = 100000000,//Hz
+    parameter VERIFY_MODE = 0//default no check
+)(
+    input sys_clk,//system clock
+    input rst_n,//system reset
+    input uart_rxd,//UART transmission end
+    /* @requires
+        \always(\valid(sys_clk))
+        \always(sys_clk == 100MHz)
+    */
+
+    /*@ensures
+        rst_n == 0 -> uart_rx_done == 0 && uart_rx_data == 0;
+
+        uart_rxd == 0 ##1 \onedata[0] ##1 
+                \onedata[1] ##1  
+                ...
+                \onedata[7] ##1 uart_rxd == 1 ->
+            \eventually(uart_rx_done == 1 && uart_rx_data == \onedata);
+
+        uart_rxd == 0 ##1 \onedata[0] ##1
+                \onedata[1] ##1 
+                ...
+                \onedata[6] ##1 uart_rxd == 0 ->  
+            \eventually(uart_rx_done == 0 && uart_rx_data == \old(uart_rx_data));
+
+        // Odd parity
+        uart_rxd == 0 ##1 \onedata[0] ##1
+                ...
+                \onedata[7] ##1 ~^(\\sum \onedata) ->   
+            \eventually(uart_rx_done == 1 && uart_rx_data == \onedata);
+        
+        // even parity
+        uart_rxd == 0 ##1 \onedata[0] ##1
+                ...
+                \onedata[7] ##1 ^(\\sum \onedata) ->
+            \eventually(uart_rx_done == 1 && uart_rx_data == \onedata);
+    */
+    output reg uart_rx_done,//receive complete flag
+    output reg [7:0]uart_rx_data//received data
+    );
+    //Check parameter definition
+    parameter VERIFY_NONE = 2'b00;//No verification
+    parameter VERIFY_ODD  = 2'b01;//Odd parity
+    parameter VERIFY_EVEN = 2'b11;//even parity
+    //FSM status code
+    localparam IDLE = 4'b0001;
+    localparam DATA = 4'b0010;
+    localparam VERI = 4'b0100;
+    localparam STOP = 4'b1000;
+    //FSM status register
+    reg [3:0] cstate,nstate;//status register
+    reg uart_rxd_d0,uart_rxd_d1;//Take two beats for synchronization
+    reg [2:0] data_cnt;//receive data bit register
+    wire baud_clk;//baud rate clock
+    wire odd_verify_flag;//Odd check success flag
+    wire even_verify_flag;//Even verification success flag
+    //Generate baud rate clock
+    CLK_div_1152 #(
+        .BAUD(BAUD),
+        .CLK_frq(CLK_frq)
+    )CLK_div(
+        .sys_clk(sys_clk),
+        .rst_n(rst_n),
+        .baud_clk (baud_clk)
+    );
+
+    //uart_rxd asynchronous signal synchronization. Reduce metastable effects
+    always @(posedge sys_clk or negedge rst_n) begin
+        if(!rst_n)begin
+            uart_rxd_d0 <= 1'b0;
+            uart_rxd_d1 <= 1'b0;
+        end
+        else begin
+            uart_rxd_d0 <= uart_rxd;
+            uart_rxd_d1 <= uart_rxd_d0;
+        end
+    end
+
+    //Receive bit count counter
+    always @(posedge baud_clk or negedge rst_n) begin
+        if(!rst_n)begin
+            data_cnt <= 3'd0;
+        end
+        else if(cstate == DATA)begin
+            data_cnt <= data_cnt + 3'd1;
+        end
+        else begin
+            data_cnt <= 3'd0;
+        end
+    end
+    //State Transition Synchronization Logic
+    always @(posedge baud_clk or negedge rst_n) begin
+        if(!rst_n)begin
+            cstate <= IDLE;
+        end
+        else begin
+            cstate <= nstate;
+        end
+    end
+    //generate the next state combinatorial logic
+    always @(*) begin
+        case (cstate)
+            IDLE: nstate = uart_rxd_d1?IDLE:DATA;
+            DATA: nstate = (&data_cnt)?((VERIFY_MODE==VERIFY_NONE)?STOP:VERI):DATA;
+            VERI: nstate = STOP;
+            STOP: nstate = IDLE;
+            default:nstate = IDLE;
+        endcase
+    end
+    //Generate output logic. Falling edge sampling data is stable
+    always @(negedge baud_clk or negedge rst_n) begin
+        if(!rst_n)begin
+            uart_rx_data <= 8'd0;
+        end
+        else begin
+            case (cstate)
+                DATA:uart_rx_data <= {uart_rxd_d1,uart_rx_data[7:1]};
+                VERI,STOP:uart_rx_data <= uart_rx_data;
+                default:uart_rx_data <= 8'd0;
+            endcase
+        end
+    end
+    //generate check digit
+    assign odd_verify_flag = (VERIFY_MODE == VERIFY_ODD) && (uart_rxd_d1 == ~(^uart_rx_data))?1'b1:1'b0;
+    assign even_verify_flag = (VERIFY_MODE == VERIFY_EVEN) && (uart_rxd_d1 == ^uart_rx_data)?1'b1:1'b0;
+    
+    always @(posedge baud_clk or negedge rst_n) begin
+        if(!rst_n)begin
+            uart_rx_done <= 1'b0;
+        end
+        else begin
+            case (nstate)
+                VERI:uart_rx_done <= (odd_verify_flag||even_verify_flag)?1'b1:1'b0;
+                STOP:uart_rx_done <= 1'b1;
+                default:uart_rx_done <= 1'b0;
+            endcase
+        end
+    end
+
+endmodule
