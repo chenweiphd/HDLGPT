@@ -91,7 +91,7 @@ Importance|Item |  Link  | Comment|
 
 ## Main Authors
 
-Project guide : CHEN Wei, ZHOU Yinhao, LI Ying, LIU Jian
+Project guide : CHEN Wei, ZHOU Yinhao, LI Ying
 
 Code development:
 
