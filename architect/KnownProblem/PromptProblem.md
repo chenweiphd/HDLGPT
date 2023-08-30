@@ -73,7 +73,7 @@ endmodule
 
 ### 正确输出应为
 
-[输出]
+[输出]    
 module shift_reg  
 (  
 input clk,  
@@ -81,14 +81,14 @@ input rst_n,
 input 	[7:0] datain_a,  
 input 	enable,  
 output  [7:0] data_out  
-);  
+);  	
 
-always @(posedge clk or negedge)  
-  if(!rst_n)  
-	data_out <= 8'b0;  
-  else if(enable)  
-	data_out <= {datain_a[0],datain_a[7:1]};  
-
+always @(posedge clk or negedge)  	
+  if(!rst_n)  	
+	data_out <= 8'b0;    
+  else if(enable)    
+	data_out <= {datain_a[0],datain_a[7:1]};   
+    
 endmodule  
 
 ### 问题分析
