@@ -213,7 +213,7 @@ module rom(
 ```
 ### 正确输出应为
 [输出]
-```
+```verilog
 module rom(
     input wire clk,
     input wire rst,
