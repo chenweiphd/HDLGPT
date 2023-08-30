@@ -197,7 +197,7 @@ I am trying to create a Verilog module called rom.The definition of the module i
 The rom contains 1024*32 bits of storage space. Writing data to rom is a temporal logic-data_i is written to memory at the address addr_i if the write enable we_i is 1. Read data from ROM is combinational logic, will address addr_i pointing to the data in memory of data_o assignment.Write verilog code that is consistent with the provided information.
 ```
 ### 正确输出应为
-
+```
 module rom(
     input wire clk,
     input wire rst,
@@ -223,7 +223,7 @@ module rom(
         end
     end
 endmodule
-
+```
 ### 问题分析
 
 要求HDLGPT生成代码后，它仅生成了模块定义，一开始我觉得可能是prompt太长了，但随着prompt不断精简并没有解决这个问题。
