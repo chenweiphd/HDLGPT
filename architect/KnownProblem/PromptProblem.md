@@ -313,6 +313,56 @@ input [7:0]addr,
 output [7:0]data
 );
 ```
+[输入]
+```verilog
+Here is the Verilog code for the module SoC:
+"module SoC(
+    input clk,
+    input rst_n,
+    output [7:0]DB,
+    output [7:0]AB
+    );
+    wire RAM_en,RAM_read,RAM_write;
+    CORE CORE_0 (
+        .clk (clk),
+        .rst_n (rst_n),
+        .DB (DB),
+        .AB (AB),
+        .ROM_en (ROM_en),
+        .ROM_read (ROM_read),
+        .RAM_en (RAM_en),
+        .RAM_read (RAM_read),
+        .RAM_write (RAM_write)
+    );
+
+    RAM RAM_0 (
+        .read (RAM_read),
+        .write (RAM_write),
+        .en (RAM_en),
+        .data (DB),
+        .addr (AB)
+    );
+endmodule"
+
+The ports of the module ROM are as follows:
+"input read
+input en
+input [7:0]addr
+output [7:0]data"
+Would you please ROM instantiated in the module SoC module
+```
+[输出]
+```verilog
+module ROM(
+    input clk,
+    input rst_n,
+    output [7:0]ROM_en,
+    output [7:0]ROM_read,
+    output [7:0]RAM_en,
+    output [7:0]RAM_read,
+    output [7:0]RAM_write
+);
+```
 ### 正确输出应为
 [输出]
 ```verilog
