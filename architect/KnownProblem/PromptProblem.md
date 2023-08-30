@@ -31,8 +31,8 @@
 
 //以上为记录模板
 
-
-## 重复定义信号
+# 2 子模块语法问题
+## 2.1 重复定义信号
 
 ### 问题描述
 
@@ -101,7 +101,7 @@ endmodule
 重复定义了reg [7:0] data_out，通过prompt告诉他"I think data_out is already defined in the module definition and there is no need to repeat it."后，仍然重复定义该信号。
 
 
-## enable信号缺失或定义错误
+## 2.2 enable信号缺失或定义错误
 
 ### 问题描述
 
@@ -147,7 +147,7 @@ endmodule
 
 缺少enable信号，通过one/few-shot方法纠正后，回答按给出的案例答案输出，但将提问与案例分开生成的情况依旧不理想。此外还存在enable信号在always控制信号中的情况，但enable一般不会出现在always控制信号中，enable的常用语句位	if（enable==1），在always块中。
 
-## 生成代码不完整	
+## 2.3 生成代码不完整	
 
 ### 问题描述	
 
@@ -238,7 +238,7 @@ endmodule
 
 要求HDLGPT生成代码后，它仅生成了模块定义，一开始我觉得可能是prompt太长了，但随着prompt不断精简并没有解决这个问题。
 
-## 相同输入下输出不稳定
+## 2.4 相同输入下输出不稳定
 
 ### 问题描述
 
@@ -248,7 +248,7 @@ endmodule
 
 希望能暂时将HDLGPT的temperature参数调高，降低生成结果随机性，尽量输出最高概率回答，方便prompt调试
 
-## 模型似乎无法理解"例化"	
+## 2.5 模型似乎无法理解"例化"	
 
 ### 问题描述	
 
