@@ -158,7 +158,8 @@ prompt长度并没有很长，但在让HDLGPT生成代码时，HDL并不生成�
 
 ### Prompt示例	
 
-Q：	
+Q：
+```
 Here is an example of the rom module:			
 "module rom(			
     input wire clk,			
@@ -193,10 +194,10 @@ I am trying to create a Verilog module called rom.The definition of the module i
     input wire[31:0] data_i,				
     output reg[31:0] data_o         			
     );"		
-The rom contains 1024*32 bits of storage space. Writing data to rom is a temporal logic-data_i is written to memory at the address addr_i if the write enable we_i is 1. Read data from ROM is combinational logic, will address addr_i pointing to the data in memory of data_o assignment.Write verilog code that is consistent with the provided information.			
+The rom contains 1024*32 bits of storage space. Writing data to rom is a temporal logic-data_i is written to memory at the address addr_i if the write enable we_i is 1. Read data from ROM is combinational logic, will address addr_i pointing to the data in memory of data_o assignment.Write verilog code that is consistent with the provided information.	```		
 
 ### 正确输出应为
-
+```
 module rom(	
     input wire clk,	
     input wire rst,	
@@ -220,7 +221,7 @@ module rom(
         end		
     end			
 endmodule
-
+```
 
 ### 问题分析
 
