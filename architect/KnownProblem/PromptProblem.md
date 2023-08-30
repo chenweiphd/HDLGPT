@@ -73,6 +73,7 @@ endmodule
 
 ### 正确输出应为
 
+[输出]
 module shift_reg
 (
 input clk,
