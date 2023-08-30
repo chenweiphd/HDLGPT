@@ -101,12 +101,6 @@ endmodule
 重复定义了reg [7:0] data_out，通过prompt告诉他"I think data_out is already defined in the module definition and there is no need to repeat it."后，仍然重复定义该信号。
 
 
-1.  always语句中的控制信号很容易出现混乱情况，包括组合逻辑中应该是"*"，出现"posedge+多种信号"。
-2.  对于prompt中给出的信号，如enable信号，大模型给出的回答中缺少enable信号，即使在prompt中给出一个正确的示例试图纠正，让大模型再次生成对应问题的答案时，输出也不理想，prompt中有"answer according to the above example"等相关关键字。
-4.  上下文理解能力有偏差，已经给出案例，并且详细说明，再次提问时采用一样的模板，提问内容不变，生成的答案与给出的案例有较大偏差
-
-
-
 ## enable信号缺失或定义错误
 
 ### 问题描述
