@@ -62,7 +62,7 @@ input  enable,
 output  reg [7:0] data_out  
 );  
 reg [7:0] data_out;  
-always @(posedge clk) begin   	  
+always @(posedge clk) begin  	 	  
     if (rst_n == 1) begin    
         data_out <= '0;    
     end else begin    
@@ -83,11 +83,13 @@ input 	enable,
 output  [7:0] data_out  
 );  	
 
-always @(posedge clk or negedge)  	
+always @(posedge clk or negedge) 	
+begin	
   if(!rst_n)  	
 	data_out <= 8'b0;    
   else if(enable)    
 	data_out <= {datain_a[0],datain_a[7:1]};   
+ end	
     
 endmodule  
 
