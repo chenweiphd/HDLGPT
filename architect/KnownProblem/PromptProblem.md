@@ -403,4 +403,93 @@ endmodule
 ![image](https://github.com/chenweiphd/HDLGPT/assets/41887469/6ec8cc12-f7d0-4c1d-82b2-661db068259a)
 
 
+## 生成答案不全，遗漏提示中的信息
 
+### 问题描述
+
+Prompt中给出详细信息，希望大模型能从中学习，或输出与提供案例相似输出，但实际输出会出现遗漏，重复等问题
+
+### Prompt示例
+```
+Q:
+We are designing a risc-v processor and need to implement the following instructions.
+/*
+NOP 		0000	Empty instruction 		short					
+LDO		0001	Fetch data from the ROM 	long				
+LDA		0010	Fetch data from RAM 		long				
+LDR		0011 	Fetch data from ACC 		short				
+PRE		0100	Fetch data from REG 		short				
+STO		0101	Write data to RAM 		long				
+ADD	    	0110	Add the operand 		short					
+SHL		0111	Move the logical left 		short				
+SHR  		1000 	Move the logical right 		short				
+SAR		1001	Count move right 		short				
+INV		1010	Take the inverse bit 		short					
+AND	    	1011	By bit and 			short					
+OR		1100	By bit or 			short					
+XOR		1101	Press Bitwise XOR 		short				
+JMP		1110	Jump 				long				
+HLT		1111	Stop instruction 		short					
+*/
+Task:Generate a .v file named"define.v" that contains various parameters, the names of each command and the corresponding opcode, as well as comments about the function completed by each command.Be sure to use Verilog-2001 syntax.
+
+you can refer to this example:
+`define NOP  4'b0000;//Empty instruction short
+`define LDO  4'b0001;// Fetch data from the ROM long
+`define LDA  4'b0010;// Fetch data from RAM long
+`define LDR  4'b0011;// Fetch data from ACC short
+`define PRE  4'b0100;// Fetch data from REG short
+`define STO  4'b0101;//Write data to RAM long
+`define ADD  4'b0110;//Add the operand short
+`define SHL  4'b0111;//Move the logical left short
+`define SHR  4'b1000;//Move the logical right short
+`define SAR  4'b1001;//Count move right short
+`define INV  4'b1010;//Take the inverse bit short
+`define AND  4'b1011;//By bit and short
+`define  OR  4'b1100;//By bit or short
+`define XOR  4'b1101;//press Bitwise XOR short
+`define JMP  4'b1110;//Jump long
+`define HLT  4'b1111;//Stop instruction short
+```
+
+```
+A:
+`define PRE  4'b0000;//Empty instruction short
+`define LDO  4'b0001;//Load data from ROM long
+`define LDR  4'b0010;//Load data from RAM long
+`define PRE  4'b0100;//Press bitwise XOR short
+`define STO  4'b0101;//Store data to RAM short
+`define ACC  4'b0110;//Count move right short
+`define ADD  4'b0111;//Add the operand short
+`define SHL  4'b1000;//Move the logical left short
+`define SHR  4'b1001;//Move the logical right short
+`define SCL  4'b1100;//SAR short
+`define HLT  4'b1111;//Stop instruction short
+```
+
+
+### 正确输出应为
+
+```verilog
+`define NOP  4'b0000;//Empty instruction short
+`define LDO  4'b0001;// Fetch data from the ROM long
+`define LDA  4'b0010;// Fetch data from RAM long
+`define LDR  4'b0011;// Fetch data from ACC short
+`define PRE  4'b0100;// Fetch data from REG short
+`define STO  4'b0101;//Write data to RAM long
+`define ADD  4'b0110;//Add the operand short
+`define SHL  4'b0111;//Move the logical left short
+`define SHR  4'b1000;//Move the logical right short
+`define SAR  4'b1001;//Count move right short
+`define INV  4'b1010;//Take the inverse bit short
+`define AND  4'b1011;//By bit and short
+`define  OR  4'b1100;//By bit or short
+`define XOR  4'b1101;//press Bitwise XOR short
+`define JMP  4'b1110;//Jump long
+`define HLT  4'b1111;//Stop instruction short
+```
+
+
+### 问题分析
+
+难以通过prompt进行修正，上面的模型输出结果还是多次重新生成后最为理想的一次，对于采用prompt方式将回答嵌入向量数据库，好像因为模型的上下文能力有限而表现不明显。在多次向大模型给出正确答案来矫正效果一般。
