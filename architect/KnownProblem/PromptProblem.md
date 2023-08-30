@@ -196,29 +196,32 @@ Q：
 	The rom contains 1024*32 bits of storage space. Writing data to rom is a temporal logic-data_i is written to memory at the address addr_i if the write enable we_i is 1. Read data from ROM is combinational logic, will address addr_i pointing to the data in memory of data_o assignment.Write verilog code that is consistent with the provided information.	
 
 ### 正确输出应为
-	module rom(	
-	    input wire clk,	
-	   input wire rst,	
-	    input wire we_i,                	   
-	    input wire[31:0] addr_i,    	
-	    input wire[31:0] data_i,	
-	    output reg[31:0] data_o        	 
-	    );
-	    reg[31:0] rom[0:1024 - 1];		
-	    always @ (posedge clk) begin		
-	        if (we_i == 1) begin		
-	            rom[addr_i] <= data_i;		
-	        end		
-	    end		
-	
-	    always @ (*) begin		
-	        if (rst == 1) begin		
-	            data_o = 32'b0;		
-	        end else begin		
-	            data_o = rom[addr_i];		
-	        end		
-	    end			
-	endmodule
+```
+module rom(
+    input wire clk,
+    input wire rst,
+    input wire we_i,                   
+    input wire[31:0] addr_i,    
+    input wire[31:0] data_i,
+    output reg[31:0] data_o         
+    );
+
+    reg[31:0] rom[0:1024 - 1];
+
+    always @ (posedge clk) begin
+        if (we_i == 1) begin
+            rom[addr_i] <= data_i;
+        end
+    end
+
+    always @ (*) begin
+        if (rst == 1) begin
+            data_o = 32'b0;
+        end else begin
+            data_o = rom[addr_i];
+        end
+    end
+endmodule
 
 ### 问题分析
 
