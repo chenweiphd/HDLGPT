@@ -41,7 +41,7 @@
 ### Prompt示例
 
 [输入]  
-```
+```verilog
 I am trying to create a Verilog module called shift register.The definition of the module is shown below:    
 "module shift_reg  
 (  
@@ -54,7 +54,7 @@ output  reg [7:0] data_out
 rst_n is the low effective reset signal. When the enable signal is set to 1, the datain_a are shifted one bit to the right and assigned to data_out.Write and explain verilog code that is consistent with the provided information.Be sure to use only synthesizable Verilog-2001 syntax.  
 ```
 [输出]    
-```
+```verilog
 module shift_reg  
 (  
 input  clk,  
@@ -76,7 +76,7 @@ endmodule
 ### 正确输出应为
 
 [输出]    
-```
+```verilog
 module shift_reg  
 (  
 input clk,  
@@ -161,7 +161,7 @@ prompt长度并没有很长，但在让HDLGPT生成代码时，HDL并不生成�
 
 ### Prompt示例	
 [输入]
-```
+```verilog
 Here is an example of the rom module:
 "module rom(
     input wire clk,
@@ -201,7 +201,7 @@ I am trying to create a Verilog module called rom.The definition of the module i
 The rom contains 1024*32 bits of storage space. Writing data to rom is a temporal logic-data_i is written to memory at the address addr_i if the write enable we_i is 1. Read data from ROM is combinational logic, will address addr_i pointing to the data in memory of data_o assignment.Write verilog code that is consistent with the provided information.
 ```
 [输出]
-```
+```verilog
 module rom(
     input wire clk,
     input wire rst,
