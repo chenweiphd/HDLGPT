@@ -70,13 +70,9 @@ always @(posedge clk) begin
     end
 end
 endmodule
-[输入]
-
-[输出]
 
 ### 正确输出应为
 
-[输出]
 module shift_reg
 (
 input clk,
