@@ -40,8 +40,8 @@
 
 ### Prompt示例
 
-[输入]
-I am trying to create a Verilog module called shift register.The definition of the module is shown below:  
+[输入]  
+I am trying to create a Verilog module called shift register.The definition of the module is shown below:    
 "module shift_reg  
 (  
 input clk,  
