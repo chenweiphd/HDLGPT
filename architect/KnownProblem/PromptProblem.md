@@ -496,3 +496,89 @@ A:
 ### 问题分析
 
 难以通过prompt进行修正，上面的模型输出结果还是多次重新生成后最为理想的一次，对于采用prompt方式将回答嵌入向量数据库，好像因为模型的上下文能力有限而表现不明显。在多次向大模型给出正确答案来矫正效果一般。
+
+## 2.5 模型对简单的指令的反馈较差
+
+### 问题描述	
+
+要求模型生成与下面的示例完全一样的代码，多次尝试后模型仍然无法输出正确的代码。
+
+### Prompt示例	
+[输入]
+```verilog
+Please generate exactly the same code as the example below.
+CODE EXAMPLE:
+    “always @(*) begin
+        case(ins)
+            NOP:alu_out = accum;
+            LDO:alu_out = alu_in;
+            LDA:alu_out = alu_in;
+            LDR:alu_out = accum;
+            PRE:alu_out = alu_in;
+            STO:alu_out = accum;
+            ADD:alu_out = accum + alu_in;
+            SHL:alu_out = alu_in<<1;
+            SHR:alu_out = alu_in>>1;
+            SAR:alu_out = {alu_in[7],alu_in[7:1]};
+            INV:alu_out = ~alu_in;
+            AND:alu_out = accum & alu_in;
+            OR :alu_out = accum | alu_in;
+            XOR:alu_out = accum ^ alu_in;
+            JMP:alu_out = alu_in;
+            HLT:alu_out = accum;
+            default:alu_out = accum;
+        endcase
+    end”
+```
+[输出]
+```verilog
+always @(*) begin
+    case(ins)
+        NOP: alu_out = accum;
+        LDO: alu_out = alu_in;
+        LDR: alu_out = accum;
+        PRE: alu_out = accum;
+        STO: alu_out = accum;
+        ADD: alu_out = accum + alu_in;
+        SHL: alu_out = accum << 1;
+        SHR: alu_out = accum >> 1;
+        SAR: alu_out = {alu_in[7],alu_in[7:1]};
+        INV: alu_out = ~alu_in;
+        AND : alu_out = accum & alu_in;
+        OR : alu_out = accum | alu_in;
+        XOR : alu_out = ins ^ accum;
+        JMP : alu_out = ins;
+        HLT : ins = ins | HLT;
+        SAR : ins = {alu_in[7],alu_in[7:1]};
+        INV : {alu_out[7],alu_out[7:1]}=ins;
+    endcase
+```
+
+### 正确输出应为
+[输出]
+```verilog
+always @(*) begin
+        case(ins)
+            NOP:alu_out = accum;
+            LDO:alu_out = alu_in;
+            LDA:alu_out = alu_in;
+            LDR:alu_out = accum;
+            PRE:alu_out = alu_in;
+            STO:alu_out = accum;
+            ADD:alu_out = accum + alu_in;
+            SHL:alu_out = alu_in<<1;
+            SHR:alu_out = alu_in>>1;
+            SAR:alu_out = {alu_in[7],alu_in[7:1]};
+            INV:alu_out = ~alu_in;
+            AND:alu_out = accum & alu_in;
+            OR :alu_out = accum | alu_in;
+            XOR:alu_out = accum ^ alu_in;
+            JMP:alu_out = alu_in;
+            HLT:alu_out = accum;
+            default:alu_out = accum;
+        endcase
+    end
+```
+### 问题分析
+
+一开始认为是prompt太复杂干扰了模型，但随着prompt不断精简，模型仍然不能完成输出与示例一致的代码的任务。
