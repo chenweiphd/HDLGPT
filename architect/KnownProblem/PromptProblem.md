@@ -93,7 +93,7 @@ endmodule
 
 ### 问题分析
 
-缺少xxx，通过xxx方法纠正后，仍出现xxxx
+重复定义了reg [7:0] data_out，通过prompt告诉他"I think data_out is already defined in the module definition and there is no need to repeat it."后，仍然重复定义该信号。
 
 
 
