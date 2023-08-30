@@ -41,6 +41,7 @@
 ### Prompt示例
 
 [输入]  
+```
 I am trying to create a Verilog module called shift register.The definition of the module is shown below:    
 "module shift_reg  
 (  
@@ -51,8 +52,9 @@ input 	enable,
 output  reg [7:0] data_out  
 );"  
 rst_n is the low effective reset signal. When the enable signal is set to 1, the datain_a are shifted one bit to the right and assigned to data_out.Write and explain verilog code that is consistent with the provided information.Be sure to use only synthesizable Verilog-2001 syntax.  
-
+```
 [输出]    
+```
 module shift_reg  
 (  
 input  clk,  
@@ -70,10 +72,11 @@ always @(posedge clk) begin
     end    
 end    
 endmodule    
-
+```
 ### 正确输出应为
 
 [输出]    
+```
 module shift_reg  
 (  
 input clk,  
@@ -92,7 +95,7 @@ begin
  end	
     
 endmodule  
-
+```
 ### 问题分析
 
 重复定义了reg [7:0] data_out，通过prompt告诉他"I think data_out is already defined in the module definition and there is no need to repeat it."后，仍然重复定义该信号。
