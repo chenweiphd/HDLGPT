@@ -41,55 +41,55 @@
 ### Prompt示例
 
 [输入]
-I am trying to create a Verilog module called shift register.The definition of the module is shown below:
-"module shift_reg
-(
-input clk,
-input rst_n,
-input 	[7:0] datain_a,
-input 	enable,
-output  reg [7:0] data_out
-);"
-rst_n is the low effective reset signal. When the enable signal is set to 1, the datain_a are shifted one bit to the right and assigned to data_out.Write and explain verilog code that is consistent with the provided information.Be sure to use only synthesizable Verilog-2001 syntax.
+I am trying to create a Verilog module called shift register.The definition of the module is shown below:  
+"module shift_reg  
+(  
+input clk,  
+input rst_n,  
+input 	[7:0] datain_a,  
+input 	enable,  
+output  reg [7:0] data_out  
+);"  
+rst_n is the low effective reset signal. When the enable signal is set to 1, the datain_a are shifted one bit to the right and assigned to data_out.Write and explain verilog code that is consistent with the provided information.Be sure to use only synthesizable Verilog-2001 syntax.  
 
 [输出]
-module shift_reg
-(
-input  clk,
-input  rst_n,
-input  [7:0] datain_a,
-input  enable,
-output  reg [7:0] data_out
-);
-reg [7:0] data_out;
-always @(posedge clk) begin
-    if (rst_n == 1) begin
-        data_out <= '0;
-    end else begin
-        data_out <= datain_a[7:0];
-    end
-end
-endmodule
+module shift_reg  
+(  
+input  clk,  
+input  rst_n,  
+input  [7:0] datain_a,  
+input  enable,  
+output  reg [7:0] data_out  
+);  
+reg [7:0] data_out;  
+always @(posedge clk) begin  
+    if (rst_n == 1) begin  
+        data_out <= '0;  
+    end else begin  
+        data_out <= datain_a[7:0];  
+    end  
+end  
+endmodule  
 
 ### 正确输出应为
 
 [输出]
-module shift_reg
-(
-input clk,
-input rst_n,
-input 	[7:0] datain_a,
-input 	enable,
-output  [7:0] data_out
-);
+module shift_reg  
+(  
+input clk,  
+input rst_n,  
+input 	[7:0] datain_a,  
+input 	enable,  
+output  [7:0] data_out  
+);  
 
-always @(posedge clk or negedge)
-  if(!rst_n)
-	data_out <= 8'b0;
-  else if(enable)
-	data_out <= {datain_a[0],datain_a[7:1]};
+always @(posedge clk or negedge)  
+  if(!rst_n)  
+	data_out <= 8'b0;  
+  else if(enable)  
+	data_out <= {datain_a[0],datain_a[7:1]};  
 
-endmodule
+endmodule  
 
 ### 问题分析
 
