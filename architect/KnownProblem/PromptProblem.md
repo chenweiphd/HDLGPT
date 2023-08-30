@@ -114,7 +114,7 @@ endmodule
 在prompt中引入enable信号但在回答中可能出现缺失、定义出错等多种错误情况。
 
 ### Prompt示例
-
+```
 Q：
 I am a digital circuit designer, I am trying to create a Verilog module named "ADD",it is a 8-bit adder module.It has"  
 input 	wire[7:0]datain_a,  
@@ -127,7 +127,7 @@ Task:explain and write verilog code consistent with the provided information, us
 
 A:
 Verilog-2001 syntax for the design of the add module:
-```
+
 module add(input [7:0] datain_a, input [7:0] datain_b, output [7:0] data_out);  
   assign data_out = datain_a + datain_b;  
 endmodule  
