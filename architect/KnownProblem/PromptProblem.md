@@ -254,3 +254,105 @@ endmodule
 
 希望能暂时将HDLGPT的temperature参数调高，降低生成结果随机性，尽量输出最高概率回答，方便prompt调试
 
+## 模型似乎无法理解"例化"	
+
+### 问题描述	
+
+很难通过Prompt来让模型完成例化的操作。
+
+### Prompt示例	
+[输入]
+```verilog
+Here is the verilog code：
+module SoC(
+    input clk,
+    input rst_n,
+    output [7:0]DB,
+    output [7:0]AB
+    );
+    wire RAM_en,RAM_read,RAM_write;
+    CORE CORE_0 (
+        .clk (clk),
+        .rst_n (rst_n),
+        .DB (DB),
+        .AB (AB),
+        .ROM_en (ROM_en),
+        .ROM_read (ROM_read),
+        .RAM_en (RAM_en),
+        .RAM_read (RAM_read),
+        .RAM_write (RAM_write)
+    );
+
+    RAM RAM_0 (
+        .read (RAM_read),
+        .write (RAM_write),
+        .en (RAM_en),
+        .data (DB),
+        .addr (AB)
+    );
+
+endmodule
+
+Now we need to instantiate a module called ROM:
+module ROM(
+    input read,
+    input en,
+    input [7:0]addr,
+    output [7:0]data
+    );
+
+Please write verilog code to instantiate the ROM and any multiplexers that it needs that is consistent with the above definition.
+```
+[输出]
+```verilog
+Here is the Verilog code to instantiate the ROM:
+module ROM(
+input read,
+input en,
+input [7:0]addr,
+output [7:0]data
+);
+```
+### 正确输出应为
+[输出]
+```verilog
+module SoC(
+    input clk,
+    input rst_n,
+    output [7:0]DB,
+    output [7:0]AB
+    );
+    wire ROM_en,ROM_read,RAM_en,RAM_read,RAM_write;
+    CORE CORE_0 (
+        .clk (clk),
+        .rst_n (rst_n),
+        .DB (DB),
+        .AB (AB),
+        .ROM_en (ROM_en),
+        .ROM_read (ROM_read),
+        .RAM_en (RAM_en),
+        .RAM_read (RAM_read),
+        .RAM_write (RAM_write)
+    );
+
+    RAM RAM_0 (
+        .read (RAM_read),
+        .write (RAM_write),
+        .en (RAM_en),
+        .data (DB),
+        .addr (AB)
+    );
+
+    ROM ROM_0 (
+        .read (ROM_read),
+        .en (ROM_en),
+        .addr (AB),
+        .data (DB)
+    );
+
+endmodule
+```
+### 问题分析
+
+让模型在SoC中例化模块ROM，但模型只输出如上内容。尝试精简Prompt直到Prompt只包含最基本的代码和指令后仍然只输出ROM的模块定义。
+
