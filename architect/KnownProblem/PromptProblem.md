@@ -343,7 +343,7 @@ The ports of the module ROM are as follows:
 input en
 input [7:0]addr
 output [7:0]data"
-Would you please ROM instantiated in the module SoC module
+Please instantiate ROM module in SoC module.
 ```
 [输出]
 ```verilog
