@@ -98,9 +98,6 @@ endmodule
 重复定义了reg [7:0] data_out，通过prompt告诉他"I think data_out is already defined in the module definition and there is no need to repeat it."后，仍然重复定义该信号。
 
 
-
-
-
 1.  always语句中的控制信号很容易出现混乱情况，包括组合逻辑中应该是"*"，出现"posedge+多种信号"。
 2.  对于prompt中给出的信号，如enable信号，大模型给出的回答中缺少enable信号，即使在prompt中给出一个正确的示例试图纠正，让大模型再次生成对应问题的答案时，输出也不理想，prompt中有"answer according to the above example"等相关关键字。
 4.  上下文理解能力有偏差，已经给出案例，并且详细说明，再次提问时采用一样的模板，提问内容不变，生成的答案与给出的案例有较大偏差
@@ -152,3 +149,79 @@ endmodule
 ### 问题分析
 
 缺少enable信号，通过one/few-shot方法纠正后，回答按给出的案例答案输出，但将提问与案例分开生成的情况依旧不理想。此外还存在enable信号在always控制信号中的情况，但enable一般不会出现在always控制信号中，enable的常用语句位	if（enable==1），在always块中。
+
+## 生成代码不完整	
+
+### 问题描述	
+
+prompt长度并没有很长，但在让HDLGPT生成代码时，HDL并不生成完整的代码。
+
+### Prompt示例	
+
+Q：	
+Here is an example of the rom module:	
+"module rom(	
+    input wire clk,	
+    input wire rst,	
+    input wire we_i,                	   
+    input wire[31:0] addr_i,    	
+    input wire[31:0] data_i,	
+    output reg[31:0] data_o        	 
+    );
+    reg[31:0] rom[0:1024 - 1];		
+    always @ (posedge clk) begin		
+        if (we_i == 1) begin		
+            rom[addr_i] <= data_i;		
+        end		
+    end		
+
+    always @ (*) begin		
+        if (rst == 1) begin		
+            data_o = 32'b0;		
+        end else begin		
+            data_o = rom[addr_i];		
+        end		
+    end			
+endmodule"		
+
+I am trying to create a Verilog module called rom.The definition of the module is shown below:		
+"module rom(		
+    input wire clk,		
+    input wire rst,		
+    input wire we_i,                   		
+    input wire[31:0] addr_i,    		
+    input wire[31:0] data_i,		
+    output reg[31:0] data_o         		
+    );"		
+The rom contains 1024*32 bits of storage space. Writing data to rom is a temporal logic-data_i is written to memory at the address addr_i if the write enable we_i is 1. Read data from ROM is combinational logic, will address addr_i pointing to the data in memory of data_o assignment.Write verilog code that is consistent with the provided information.
+
+### 正确输出应为
+
+module rom(	
+    input wire clk,	
+    input wire rst,	
+    input wire we_i,                	   
+    input wire[31:0] addr_i,    	
+    input wire[31:0] data_i,	
+    output reg[31:0] data_o        	 
+    );
+    reg[31:0] rom[0:1024 - 1];		
+    always @ (posedge clk) begin		
+        if (we_i == 1) begin		
+            rom[addr_i] <= data_i;		
+        end		
+    end		
+
+    always @ (*) begin		
+        if (rst == 1) begin		
+            data_o = 32'b0;		
+        end else begin		
+            data_o = rom[addr_i];		
+        end		
+    end			
+endmodule
+
+
+### 问题分析
+
+要求HDLGPT生成代码后，它仅生成了模块定义，一开始我觉得可能是prompt太长了，但随着prompt不断精简并没有解决这个问题。
