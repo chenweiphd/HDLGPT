@@ -52,7 +52,7 @@ output  reg [7:0] data_out
 );"  
 rst_n is the low effective reset signal. When the enable signal is set to 1, the datain_a are shifted one bit to the right and assigned to data_out.Write and explain verilog code that is consistent with the provided information.Be sure to use only synthesizable Verilog-2001 syntax.  
 
-[输出]
+[输出]    
 module shift_reg  
 (  
 input  clk,  
@@ -62,14 +62,14 @@ input  enable,
 output  reg [7:0] data_out  
 );  
 reg [7:0] data_out;  
-always @(posedge clk) begin  
-    if (rst_n == 1) begin  
-        data_out <= '0;  
-    end else begin  
-        data_out <= datain_a[7:0];  
-    end  
-end  
-endmodule  
+always @(posedge clk) begin   	  
+    if (rst_n == 1) begin    
+        data_out <= '0;    
+    end else begin    
+        data_out <= datain_a[7:0];    
+    end    
+end    
+endmodule    
 
 ### 正确输出应为
 
