@@ -399,4 +399,8 @@ endmodule
 ### 问题分析
 
 让模型在SoC中例化模块ROM，但模型只输出ROM的模块定义。尝试精简Prompt直到Prompt只包含最基本的代码和指令后仍然只输出ROM的模块定义。
+而且模型似乎也无法正确解释例化模块的概念：
+![image](https://github.com/chenweiphd/HDLGPT/assets/41887469/6ec8cc12-f7d0-4c1d-82b2-661db068259a)
+
+
 
