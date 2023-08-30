@@ -116,37 +116,37 @@ endmodule
 ### Prompt示例
 
 Q：
-I am a digital circuit designer, I am trying to create a Verilog module named "ADD",it is a 8-bit adder module.It has"
-input 	wire[7:0]datain_a,
-input 	wire[7:0]datain_b,
-input 	wire enable,
-output  wire[7:0]data_out "
-enable==1 -> \data_out=datain_a+datain_b;
-Requirements:This module implements the addition of two 8bit numbers with enable signal.The enable signal determines whether the operation of addition is performed or not.
-Task:explain and write verilog code consistent with the provided information, use only synthesizable Verilog-2001 syntax.
+I am a digital circuit designer, I am trying to create a Verilog module named "ADD",it is a 8-bit adder module.It has"  
+input 	wire[7:0]datain_a,  
+input 	wire[7:0]datain_b,  
+input 	wire enable,  
+output  wire[7:0]data_out "  
+enable==1 -> \data_out=datain_a+datain_b;  
+Requirements:This module implements the addition of two 8bit numbers with enable signal.The enable signal determines whether the operation of addition is performed or not.  
+Task:explain and write verilog code consistent with the provided information, use only synthesizable Verilog-2001 syntax.  
 
 A:
 Verilog-2001 syntax for the design of the add module:
 
-module add(input [7:0] datain_a, input [7:0] datain_b, output [7:0] data_out);
-  assign data_out = datain_a + datain_b;
-endmodule
+module add(input [7:0] datain_a, input [7:0] datain_b, output [7:0] data_out);  
+  assign data_out = datain_a + datain_b;  
+endmodule  
 
 
 ### 正确输出应为
 
-module ADD(
+module ADD(  
 input 	[7:0]datain_a,
 input 	[7:0]datain_b,
 input 	enable,
 output  [7:0]data_out
-);
-reg [7:0]dataout_temp;
-always @(*)
-  if(enable==1)
-	dataout_temp = datain_a + datain_b;
-assign data_out = dataout_temp;
-endmodule
+);  
+reg [7:0]dataout_temp;  
+always @(*)  
+  if(enable==1)  
+	dataout_temp = datain_a + datain_b;  
+assign data_out = dataout_temp;  
+endmodule  
 
 
 ### 问题分析
