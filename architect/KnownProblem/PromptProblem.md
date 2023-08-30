@@ -127,14 +127,14 @@ Task:explain and write verilog code consistent with the provided information, us
 
 A:
 Verilog-2001 syntax for the design of the add module:
-
+```
 module add(input [7:0] datain_a, input [7:0] datain_b, output [7:0] data_out);  
   assign data_out = datain_a + datain_b;  
 endmodule  
-
+```
 
 ### 正确输出应为
-
+```
 module ADD(  
 input 	[7:0]datain_a,
 input 	[7:0]datain_b,
@@ -147,7 +147,7 @@ always @(*)
 	dataout_temp = datain_a + datain_b;  
 assign data_out = dataout_temp;  
 endmodule  
-
+```
 
 ### 问题分析
 
